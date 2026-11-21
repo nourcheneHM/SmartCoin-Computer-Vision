@@ -21,7 +21,7 @@ l'objet d'un commit explicite.
 | `image_id` | Identifiant unique de l'image |
 | `file_name` | Chemin relatif depuis `data/` |
 | `difficulty_level` | 1 à 4 (voir `data/README.md`) |
-| `source` | `group` ou `roboflow` |
+| `source` | Membre / session de prise de vue (ex. `s03`) |
 | `notes` | Remarques éventuelles |
 
 ### `ground_truth.csv`

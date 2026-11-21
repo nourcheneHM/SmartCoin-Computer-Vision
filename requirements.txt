@@ -1,6 +1,6 @@
 # =============================================================
 # SmartCoin — dépendances Python (première version)
-# Python recommandé : 3.11 ou 3.12
+# Version de Python retenue : 3.12
 #
 # Les bornes de version sont indicatives. Une fois l'environnement installé
 # et testé, les versions exactes seront figées (pip freeze) pour la reproductibilité.

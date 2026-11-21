@@ -95,12 +95,11 @@ Un seul framework de Deep Learning est utilisé : **PyTorch** (YOLOv8 repose sur
 
 ## 5. Dataset
 
-- **Source principale : images collectées par le groupe** (photos de pièces tunisiennes réelles).
+- **Source : dataset original constitué par le groupe.** Toutes les images ont été
+  photographiées par les membres du groupe avec leurs smartphones, sur des pièces
+  tunisiennes réelles. Aucun dataset externe n'est utilisé.
   - Nombre d'images, classes présentes, résolution, annotations : *à compléter après inspection*.
-- **Source complémentaire envisagée :** [Tunisian Currency Detection — Roboflow Universe](https://universe.roboflow.com/ahmed-khgsr/tunisian-currency-detection).
-  Le sujet indique 423 images annotées ; **ce chiffre, les classes et la licence restent à vérifier**
-  sur la page actuelle avant toute utilisation.
-- **Références visuelles et numismatiques :**
+- **Références visuelles et numismatiques** (documentation uniquement, non utilisées pour l'entraînement) :
   [Wikimedia Commons — Tunisian dinar coins](https://commons.wikimedia.org/wiki/Category:Tunisian_dinar_coins),
   [Catalogue Cnumis — Tunisie](https://fr.cnumis.com/catalogue/region-images/tunisia-5).
 
@@ -138,13 +137,14 @@ Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat n'est d
 
 | Nom | Prénom |
 |---|---|
-| *À compléter* | *À compléter* |
-| *À compléter* | *À compléter* |
+| Hammami | Nourchene |
+| Gherab | Lasisa  |
+| Bahrini| Adem |
+| Maaoui | Rayene  |
 
 ## 9. Technologies et bibliothèques envisagées
 
-- **Langage :** Python 3.11 ou 3.12 (les versions plus récentes ne sont pas encore garanties
-  compatibles avec PyTorch/Ultralytics)
+- **Langage :** Python 3.12 (version retenue pour la compatibilité avec PyTorch/Ultralytics)
 - **Traitement d'image :** OpenCV, NumPy
 - **Données et visualisation :** Pandas, Matplotlib
 - **Métriques :** scikit-learn
@@ -157,10 +157,10 @@ Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat n'est d
 
 ```bash
 # 1. Cloner le dépôt
-git clone <URL_DU_DEPOT_A_COMPLETER>
-cd <NOM_DU_DOSSIER>
+git clone https://github.com/nourcheneHM/SmartCoin-Computer-Vision.git
+cd SmartCoin-Computer-Vision
 
-# 2. Créer et activer un environnement virtuel (Python 3.11 ou 3.12)
+# 2. Créer et activer un environnement virtuel (Python 3.12)
 py -3.12 -m venv .venv          # Windows
 .venv\Scripts\activate          # Windows
 # python3.12 -m venv .venv && source .venv/bin/activate   # Linux / macOS

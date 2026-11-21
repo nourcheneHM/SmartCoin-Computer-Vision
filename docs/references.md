@@ -5,14 +5,16 @@ Les entrées marquées *à compléter* seront précisées au fur et à mesure.
 
 ## 1. Données
 
-- **Tunisian Currency Detection** — Roboflow Universe, espace « ahmed-khgsr ».
-  https://universe.roboflow.com/ahmed-khgsr/tunisian-currency-detection
-  Licence et citation officielle : *à compléter après vérification sur la page*.
+- **Dataset SmartCoin (original)** — photographies prises par les membres du groupe avec
+  leurs smartphones. Aucun dataset externe n'est utilisé pour l'entraînement ou le test.
+  Détails (dates, conditions, nombre d'images) : *à compléter*.
+
+Ressources consultées uniquement comme documentation :
+
 - **Wikimedia Commons — Category: Tunisian dinar coins.**
   https://commons.wikimedia.org/wiki/Category:Tunisian_dinar_coins
   (licence propre à chaque fichier)
 - **Cnumis — Catalogue des pièces de Tunisie.** https://fr.cnumis.com/catalogue/region-images/tunisia-5
-- **Images collectées par le groupe** — *à compléter* (dates, conditions).
 
 ## 2. Bibliothèques et documentation
 
