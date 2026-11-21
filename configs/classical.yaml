@@ -1,28 +1,34 @@
 # Paramètres de l'approche classique (sans IA).
 # Valeurs INITIALES à tester, pas des valeurs définitives :
-# elles seront calibrées sur les images de développement (data/dev/), jamais sur le test.
+# elles sont réglées sur les images de développement (data/raw/group, data/raw/new/train),
+# JAMAIS sur data/raw/new/test.
 
 preprocessing:
-  resize_max_side: 1024        # redimensionnement pour accélérer le traitement
+  max_side: 1024               # plus grand côté après redimensionnement (pixels)
   blur: median                 # median | gaussian
-  blur_ksize: 5
+  blur_ksize: 7                # noyau impair ; plus grand = efface mieux la texture du tissu
   clahe:
     enabled: true
     clip_limit: 2.0
     tile_grid_size: [8, 8]
 
 detection:
-  method: hough                # hough | contours
-  hough:
-    dp: 1.2
-    min_dist_ratio: 0.05       # distance minimale entre centres / plus grand côté de l'image
-    param1: 100                # seuil haut de Canny interne
-    param2: 40                 # seuil de l'accumulateur (plus bas = plus de cercles)
-    min_radius_ratio: 0.02
-    max_radius_ratio: 0.25
-  contours:
-    min_circularity: 0.75
+  method: hybrid               # hough | segmentation | hybrid (fusion des deux)
+  segmentation:                # soustraction du fond (Lab) + Otsu + morphologie + distance
+    border_ratio: 0.03         # largeur de la bande de bord servant à estimer le fond
+    l_weight: 0.5              # poids de la luminance L (< 1 : moins sensible aux ombres)
+    blur_ksize: 7
+    morph_ksize: 7
+    min_radius_ratio: 0.03
+    max_radius_ratio: 0.50
+  hough:                       # cv2.HOUGH_GRADIENT_ALT
+    dp: 1.5                    # résolution de l'accumulateur (1.5 recommandé pour ALT)
+    param1: 150                # seuil haut de Canny interne
+    param2: 0.80               # perfection du cercle (0-1) ; plus haut = moins de faux cercles
+    min_dist_ratio: 0.04       # distance min. entre centres / plus petit côté
+    min_radius_ratio: 0.03     # rayon min. / plus petit côté
+    max_radius_ratio: 0.50     # rayon max. / plus petit côté (gros plans de group/)
 
 classification:
-  # Règles taille relative + couleur HSV : à définir après calibration.
+  # Règles taille relative + couleur HSV : définies à l'étape de calibration.
   unknown_label: unknown
