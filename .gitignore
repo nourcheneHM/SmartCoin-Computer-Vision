@@ -1,0 +1,76 @@
+# =============================================================
+# SmartCoin — fichiers et dossiers exclus du dépôt Git
+# =============================================================
+
+# --- Documents de travail privés (cours, consignes, prompts) ---
+r_sum_du_cours_computer_vision.md
+smartcoin_summary.md
+prompt_claude_smartcoin_corrige_GitHub.md
+_private/
+
+# --- Données : les images ne sont PAS versionnées ---
+# On garde uniquement data/README.md (instructions de téléchargement/organisation).
+data/*
+!data/README.md
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# --- Modèles, poids et checkpoints (trop volumineux) ---
+models/*
+!models/README.md
+*.pt
+*.pth
+*.onnx
+*.h5
+*.ckpt
+*.engine
+*.tflite
+
+# --- Résultats générés (images annotées, runs YOLO, logs) ---
+results/*
+!results/README.md
+runs/
+logs/
+*.log
+wandb/
+mlruns/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Environnements virtuels ---
+.venv/
+venv/
+env/
+.conda/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Secrets et configuration locale ---
+.env
+.env.*
+*.key
+secrets.*
+roboflow_api_key*
+.streamlit/secrets.toml
+.claude/settings.local.json
+
+# --- IDE et système ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
