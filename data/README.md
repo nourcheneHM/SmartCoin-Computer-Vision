@@ -58,8 +58,15 @@ apparente n'y est pas comparable d'une photo à l'autre. Ces photos servent donc
 | `train/L4` | 4 | Pièces qui se touchent ou se chevauchent | 10 |
 | `test/L2`, `test/L3`, `test/L4` | 2 à 4 | **Jeu de test commun figé** (10 images par niveau) | 30 |
 
-Les photos L1 (même distance pour toutes les classes) permettent de comparer les tailles
-réelles des pièces et de calibrer l'approche classique.
+Les photos L1 devaient être prises à hauteur fixe ; la mesure montre que la hauteur a
+varié (ex. 1 dinar : rayon 120 px sur tissu, 94 px sur papier). Elles servent donc à
+calibrer la **couleur** et la **forme**, pas la taille absolue. Les tailles relatives
+s'appuient sur les diamètres réels mesurés par le groupe sur ses pièces
+(`src/common/coin_classes.py`).
+
+`train/contenu_train.csv` donne, pour chacune des 55 photos L2 à L4, le nombre de pièces
+par classe (même format que `test/contenu_test.csv`). Il sert à évaluer et régler
+l'approche classique **sur le développement**, sans toucher au jeu de test.
 
 ## 4. Organisation locale
 
@@ -71,7 +78,7 @@ data/
     ├── group/multiple_coins/
     └── new/
         ├── train/L1_<fond>/<classe>/
-        ├── train/L2/  train/L3/  train/L4/
+        ├── train/L2/  train/L3/  train/L4/  + contenu_train.csv
         └── test/L2/  test/L3/  test/L4/  + contenu_test.csv
 ```
 

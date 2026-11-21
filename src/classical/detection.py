@@ -73,13 +73,7 @@ def foreground_mask(img_bgr: np.ndarray, cfg: dict, steps: dict | None = None) -
     if steps is None:
         steps = {}
     lab = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2LAB).astype(np.float32)
-    h, w = lab.shape[:2]
-    b = max(2, round(cfg["border_ratio"] * min(h, w)))
-    border = np.concatenate([lab[:b].reshape(-1, 3), lab[-b:].reshape(-1, 3),
-                             lab[:, :b].reshape(-1, 3), lab[:, -b:].reshape(-1, 3)])
-    bg = np.median(border, axis=0)
-
-    diff = lab - bg
+    diff = lab - background_lab(lab, cfg["border_ratio"])
     diff[..., 0] *= cfg["l_weight"]
     dist = np.linalg.norm(diff, axis=2)
     dist = np.clip(dist * 255.0 / max(dist.max(), 1e-6), 0, 255).astype(np.uint8)
@@ -100,6 +94,15 @@ def foreground_mask(img_bgr: np.ndarray, cfg: dict, steps: dict | None = None) -
         filled = drop_border_regions(filled)
     steps["masque_final"] = filled
     return filled
+
+
+def background_lab(lab: np.ndarray, border_ratio: float) -> np.ndarray:
+    """Couleur du fond : médiane (L, a, b) d'une bande le long des bords de l'image."""
+    h, w = lab.shape[:2]
+    b = max(2, round(border_ratio * min(h, w)))
+    border = np.concatenate([lab[:b].reshape(-1, 3), lab[-b:].reshape(-1, 3),
+                             lab[:, :b].reshape(-1, 3), lab[:, -b:].reshape(-1, 3)])
+    return np.median(border, axis=0)
 
 
 def drop_border_regions(mask: np.ndarray) -> np.ndarray:

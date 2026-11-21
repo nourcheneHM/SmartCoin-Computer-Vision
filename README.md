@@ -130,7 +130,7 @@ Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat n'est d
 |---|---|---|
 | 1 — Dépôt GitHub | Dépôt, README, arborescence, dépendances, documentation | Terminé |
 | 2 — Dataset | Collecte, inspection, organisation des images, jeu de test commun figé | Terminé (annotations des boîtes et split de validation à faire avant le jalon 4) |
-| 3 — Approche classique | Détection et classification des pièces avec OpenCV et des règles | À faire |
+| 3 — Approche classique | Détection et classification des pièces avec OpenCV et des règles | En cours (pipeline complet fonctionnel ; réglages sur les images de développement) |
 | 4 — Approche IA | Entraînement et évaluation de YOLOv8 (variante YOLO + CNN si pertinent) | À faire |
 | 5 — Comparaison | Les deux approches sur exactement les mêmes images de test | À faire |
 | 6 — Application et rapport | Interface Streamlit, rapport, présentation | À faire |
@@ -180,10 +180,19 @@ python -m src.data.inspect_dataset --root data/raw/group --out results/inspectio
 python -m src.data.inspect_dataset --root data/raw/new --out results/inspection_new
 ```
 
-Commandes prévues (**non fonctionnelles à ce stade**, les scripts sont en cours de développement) :
+Approche classique (fonctionnelle) :
 
 ```bash
-python -m src.classical.pipeline --image chemin/vers/image.jpg      # approche classique
+python -m src.classical.pipeline --input data/raw/new/train/L2      # détection + classification + montant
+python -m src.classical.debug_steps --input data/raw/new/train/L4   # visualisation des étapes de détection
+python -m src.classical.calibrate                                   # mesures justifiant les seuils
+python -m src.evaluation.count_metrics --pred results/classical/dev/predictions.csv \
+    --truth data/raw/new/train/contenu_train.csv                    # évaluation par comptage (dev)
+```
+
+Commandes prévues (**non fonctionnelles à ce stade**) :
+
+```bash
 python -m src.ai.train --config configs/yolo_data.yaml              # entraînement YOLO
 python -m src.evaluation.compare --manifest evaluation/test_manifest.csv   # comparaison
 streamlit run app/streamlit_app.py                                  # interface
