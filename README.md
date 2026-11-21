@@ -1,8 +1,7 @@
 # SmartCoin — Tri et comptage des pièces de monnaie tunisiennes par Vision par Ordinateur
 
-> **Statut du projet : phase de cadrage (dépôt initial).**
-> Aucun modèle n'est encore implémenté ni entraîné. Ce dépôt présente le projet envisagé,
-> son organisation et le protocole expérimental prévu. Les sections marquées
+> **Statut du projet : dataset constitué et inspecté (jalons 1 et 2).**
+> Aucun modèle n'est encore implémenté ni entraîné. Les sections marquées
 > « à compléter » seront mises à jour au fil du projet.
 
 Projet universitaire — module Vision par Ordinateur (IRM2).
@@ -98,7 +97,12 @@ Un seul framework de Deep Learning est utilisé : **PyTorch** (YOLOv8 repose sur
 - **Source : dataset original constitué par le groupe.** Toutes les images ont été
   photographiées par les membres du groupe avec leurs smartphones, sur des pièces
   tunisiennes réelles. Aucun dataset externe n'est utilisé.
-  - Nombre d'images, classes présentes, résolution, annotations : *à compléter après inspection*.
+  - **342 images JPEG** (majoritairement 1536 × 2048), les **9 classes** visées présentes,
+    4 fonds différents (tissu blanc, papier blanc, papier orange, tissu jaune).
+  - 230 photos initiales (une pièce par photo, classées par valeur) et 112 photos
+    complémentaires prises selon un protocole par niveau de difficulté (1 à 4).
+  - **Jeu de test commun figé :** 30 images (10 par niveau 2, 3 et 4) contenant **220 pièces**.
+  - Annotations par boîtes englobantes : *à réaliser avant le jalon 4*.
 - **Références visuelles et numismatiques** (documentation uniquement, non utilisées pour l'entraînement) :
   [Wikimedia Commons — Tunisian dinar coins](https://commons.wikimedia.org/wiki/Category:Tunisian_dinar_coins),
   [Catalogue Cnumis — Tunisie](https://fr.cnumis.com/catalogue/region-images/tunisia-5).
@@ -122,16 +126,14 @@ Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat n'est d
 
 ## 7. Principales étapes de réalisation
 
-| # | Étape | Statut |
+| Jalon | Contenu | Statut |
 |---|---|---|
-| 1 | Dépôt GitHub initial et documentation | En cours |
-| 2 | Inspection et vérification du dataset (classes, nombre d'images, qualité, licence) | À faire |
-| 3 | Annotation, splits train/validation/test, jeu de test commun figé | À faire |
-| 4 | Approche classique (OpenCV + règles) | À faire |
-| 5 | Approche IA (YOLOv8, puis variante YOLO + CNN si pertinent) | À faire |
-| 6 | Évaluation et comparaison sur le jeu de test commun | À faire |
-| 7 | Interface de démonstration (Streamlit) | À faire |
-| 8 | Rapport et soutenance | À faire |
+| 1 — Dépôt GitHub | Dépôt, README, arborescence, dépendances, documentation | Terminé |
+| 2 — Dataset | Collecte, inspection, organisation des images, jeu de test commun figé | Terminé (annotations des boîtes et split de validation à faire avant le jalon 4) |
+| 3 — Approche classique | Détection et classification des pièces avec OpenCV et des règles | À faire |
+| 4 — Approche IA | Entraînement et évaluation de YOLOv8 (variante YOLO + CNN si pertinent) | À faire |
+| 5 — Comparaison | Les deux approches sur exactement les mêmes images de test | À faire |
+| 6 — Application et rapport | Interface Streamlit, rapport, présentation | À faire |
 
 ## 8. Membres du groupe
 
@@ -169,6 +171,13 @@ py -3.12 -m venv .venv          # Windows
 pip install -r requirements.txt
 
 # 4. Placer les données selon data/README.md
+```
+
+Inspection du dataset (fonctionnelle) :
+
+```bash
+python -m src.data.inspect_dataset --root data/raw/group --out results/inspection
+python -m src.data.inspect_dataset --root data/raw/new --out results/inspection_new
 ```
 
 Commandes prévues (**non fonctionnelles à ce stade**, les scripts sont en cours de développement) :

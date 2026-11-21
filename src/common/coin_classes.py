@@ -16,7 +16,7 @@ COIN_VALUES_MILLIMES: dict[str, int] = {
     "100_millimes": 100,
     "200_millimes": 200,
     "500_millimes": 500,
-    "1_dinar": 1000,
+    "1_dinars": 1000,
     "2_dinars": 2000,
     "5_dinars": 5000,
 }

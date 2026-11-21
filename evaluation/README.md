@@ -8,8 +8,9 @@ les deux pipelines sont exécutés sur **les mêmes fichiers images** et évalu�
 
 | Fichier | Rôle |
 |---|---|
-| `test_manifest.csv` | Liste figée des images du jeu de test commun |
-| `ground_truth.csv` | Annotations de référence (une ligne par pièce) |
+| `test_manifest.csv` | Liste figée des 30 images du jeu de test commun |
+| `test_counts.csv` | Nombre de pièces par classe dans chaque image de test (noté à la prise de vue) et montant total en millimes |
+| `ground_truth.csv` | Annotations de référence, une ligne par pièce (*à remplir après l'annotation des boîtes*) |
 
 Ces fichiers sont petits et **versionnés**. Toute modification du jeu de test doit faire
 l'objet d'un commit explicite.
@@ -21,7 +22,7 @@ l'objet d'un commit explicite.
 | `image_id` | Identifiant unique de l'image |
 | `file_name` | Chemin relatif depuis `data/` |
 | `difficulty_level` | 1 à 4 (voir `data/README.md`) |
-| `source` | Membre / session de prise de vue (ex. `s03`) |
+| `source` | Origine des images (`photos_groupe`) |
 | `notes` | Remarques éventuelles |
 
 ### `ground_truth.csv`
