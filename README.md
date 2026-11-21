@@ -1,8 +1,8 @@
 # SmartCoin — Tri et comptage des pièces de monnaie tunisiennes par Vision par Ordinateur
 
-> **Statut du projet : dataset constitué et inspecté (jalons 1 et 2).**
-> Aucun modèle n'est encore implémenté ni entraîné. Les sections marquées
-> « à compléter » seront mises à jour au fil du projet.
+> **Statut du projet : approche classique terminée (jalons 1 à 3).**
+> Ses paramètres sont **figés** avant toute évaluation sur le jeu de test.
+> L'approche IA (jalon 4) n'est pas encore commencée.
 
 Projet universitaire — module Vision par Ordinateur (IRM2).
 
@@ -64,14 +64,22 @@ Deux pipelines indépendants produiront ces mêmes sorties, ce qui permettra de 
 
 ### 4.1 Approche classique (sans IA)
 
-Traitement d'image et règles de décision, avec **Python, OpenCV et NumPy** :
+Traitement d'image et règles de décision, avec **Python, OpenCV et NumPy**
+(code : [src/classical/](src/classical/), paramètres : [configs/classical.yaml](configs/classical.yaml)) :
 
-| Étape | Méthodes envisagées |
+| Étape | Méthodes retenues |
 |---|---|
-| Prétraitement | Niveaux de gris, espaces HSV/Lab, flou gaussien ou médian, CLAHE |
-| Détection | `cv2.HoughCircles` (méthode de départ) ; en alternative : seuillage Otsu/adaptatif, morphologie mathématique, contours et composantes connexes (utile pour les pièces proches) |
-| Caractéristiques | Rayon/diamètre apparent **relatif**, aire, périmètre, circularité `4π·Aire/Périmètre²`, couleur dominante en HSV |
-| Classification | Règles et seuils **calibrés sur des images de développement**, combinant taille relative et couleur ; classe « inconnue » si aucune règle n'est satisfaite |
+| Prétraitement | Redimensionnement (1024 px), niveaux de gris, CLAHE, flou médian |
+| Détection | **Hybride** : `cv2.HoughCircles` (contours) + segmentation par soustraction de la couleur du fond (Lab, Otsu, morphologie, transformée de distance pour séparer les pièces collées) ; fusion et suppression des cercles imbriqués |
+| Caractéristiques | Couleur **Lab** (jaune b* du disque, du centre et de l'anneau), contraste bimétal, score de forme à **13 côtés** (bord suivi par programmation dynamique + harmonique de Fourier), rayon affiné |
+| Classification | Règles : métal (5 dinars = bimétal ; doré/argenté jugé **relativement** aux autres pièces de la photo, avec le 5 dinars comme référence de couleur), forme (200 millimes / 2 dinars), puis **taille relative** : recherche de l'échelle (pixels/mm) qui explique le mieux tous les rayons de la photo par les diamètres réels ; « inconnue » si aucun diamètre compatible |
+| Comptage | Nombre par classe et montant total en millimes (les inconnues sont exclues du total) |
+
+Seuils calibrés **uniquement sur les images de développement**. Résultats de développement
+(55 photos multi-pièces, 364 pièces, évaluation par comptage) : 363 pièces détectées,
+274 bien classées (75 %), erreur moyenne sur le montant 861 millimes. Ces chiffres sont
+optimistes (seuils réglés sur ces mêmes photos) ; l'évaluation non biaisée se fera sur le
+jeu de test au jalon 5. Détails, choix et limites : [docs/remarques_rapport.md](docs/remarques_rapport.md).
 
 ### 4.2 Approche avec IA (Deep Learning)
 
@@ -122,7 +130,7 @@ pour l'organisation locale et la préparation des données.
    temps moyen par image ; résultats par **niveau de difficulté** (1 : pièce seule sur fond uni →
    4 : pièces proches ou superposées).
 
-Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat n'est disponible à ce stade.
+Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat sur le jeu de test n'est disponible à ce stade.
 
 ## 7. Principales étapes de réalisation
 
@@ -130,7 +138,7 @@ Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat n'est d
 |---|---|---|
 | 1 — Dépôt GitHub | Dépôt, README, arborescence, dépendances, documentation | Terminé |
 | 2 — Dataset | Collecte, inspection, organisation des images, jeu de test commun figé | Terminé (annotations des boîtes et split de validation à faire avant le jalon 4) |
-| 3 — Approche classique | Détection et classification des pièces avec OpenCV et des règles | En cours (pipeline complet fonctionnel ; réglages sur les images de développement) |
+| 3 — Approche classique | Détection et classification des pièces avec OpenCV et des règles | Terminé (paramètres figés) |
 | 4 — Approche IA | Entraînement et évaluation de YOLOv8 (variante YOLO + CNN si pertinent) | À faire |
 | 5 — Comparaison | Les deux approches sur exactement les mêmes images de test | À faire |
 | 6 — Application et rapport | Interface Streamlit, rapport, présentation | À faire |
@@ -153,7 +161,7 @@ Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat n'est d
 - **Deep Learning :** PyTorch, Ultralytics YOLOv8
 - **Interface :** Streamlit
 - **Environnement :** Jupyter / VS Code ; entraînement sur GPU via Kaggle ou Google Colab si nécessaire
-- **Annotation :** outil à choisir (ex. Roboflow, Label Studio ou CVAT)
+- **Annotation :** Label Studio (prévu pour les boîtes englobantes, avant le jalon 4)
 
 ## 10. Installation et exécution (prévisionnelles)
 
@@ -221,8 +229,10 @@ smartcoin/
 └── docs/               # références et documentation
 ```
 
-Les fichiers de code actuels sont des **squelettes** documentés : ils décrivent le rôle
-prévu de chaque module mais ne sont pas encore fonctionnels.
+Modules fonctionnels : `src/data/` (inspection), `src/classical/` (approche classique),
+`src/common/` (classes, montant, affichage), `src/evaluation/count_metrics.py`
+(évaluation par comptage). Restent des **squelettes** : `src/ai/`,
+`src/evaluation/compare.py`, `app/` et `tests/`.
 
 ## 12. Références
 
