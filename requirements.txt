@@ -1,0 +1,32 @@
+# =============================================================
+# SmartCoin — dépendances Python (première version)
+# Python recommandé : 3.11 ou 3.12
+#
+# Les bornes de version sont indicatives. Une fois l'environnement installé
+# et testé, les versions exactes seront figées (pip freeze) pour la reproductibilité.
+# =============================================================
+
+# --- Traitement d'image et calcul (approche classique) ---
+opencv-python>=4.8
+numpy>=1.24
+
+# --- Données, visualisation, configuration ---
+pandas>=2.0
+matplotlib>=3.7
+PyYAML>=6.0
+tqdm>=4.65
+
+# --- Métriques (precision, recall, F1, matrice de confusion) ---
+scikit-learn>=1.3
+
+# --- Deep Learning (approche IA) : un seul framework, PyTorch ---
+# Ultralytics installe automatiquement torch et torchvision (version CPU par défaut).
+# Pour un GPU NVIDIA local, installer d'abord torch avec CUDA selon https://pytorch.org/get-started/locally/
+ultralytics>=8.0
+
+# --- Interface de démonstration ---
+streamlit>=1.30
+
+# --- Développement ---
+jupyter>=1.0
+pytest>=7.0
