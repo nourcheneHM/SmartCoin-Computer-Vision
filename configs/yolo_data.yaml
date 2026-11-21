@@ -1,0 +1,19 @@
+# Configuration du dataset au format Ultralytics YOLO.
+# Les chemins pointent vers les données locales (non versionnées), générées dans data/yolo/.
+# La liste des classes est PROVISOIRE : elle sera ajustée après inspection du dataset.
+
+path: data/yolo
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: 10_millimes
+  1: 20_millimes
+  2: 50_millimes
+  3: 100_millimes
+  4: 200_millimes
+  5: 500_millimes
+  6: 1_dinar
+  7: 2_dinars
+  8: 5_dinars

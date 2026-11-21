@@ -1,0 +1,28 @@
+# Paramètres de l'approche classique (sans IA).
+# Valeurs INITIALES à tester, pas des valeurs définitives :
+# elles seront calibrées sur les images de développement (data/dev/), jamais sur le test.
+
+preprocessing:
+  resize_max_side: 1024        # redimensionnement pour accélérer le traitement
+  blur: median                 # median | gaussian
+  blur_ksize: 5
+  clahe:
+    enabled: true
+    clip_limit: 2.0
+    tile_grid_size: [8, 8]
+
+detection:
+  method: hough                # hough | contours
+  hough:
+    dp: 1.2
+    min_dist_ratio: 0.05       # distance minimale entre centres / plus grand côté de l'image
+    param1: 100                # seuil haut de Canny interne
+    param2: 40                 # seuil de l'accumulateur (plus bas = plus de cercles)
+    min_radius_ratio: 0.02
+    max_radius_ratio: 0.25
+  contours:
+    min_circularity: 0.75
+
+classification:
+  # Règles taille relative + couleur HSV : à définir après calibration.
+  unknown_label: unknown
