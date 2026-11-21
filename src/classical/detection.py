@@ -57,7 +57,7 @@ def detect_hough(gray: np.ndarray, cfg: dict) -> list[CoinCandidate]:
     return remove_nested(candidates)
 
 
-def foreground_mask(img_bgr: np.ndarray, cfg: dict) -> np.ndarray:
+def foreground_mask(img_bgr: np.ndarray, cfg: dict, steps: dict | None = None) -> np.ndarray:
     """Masque binaire des pièces par soustraction de la couleur du fond.
 
     1. La couleur du fond est estimée par la médiane (espace Lab) d'une bande sur les bords
@@ -66,7 +66,12 @@ def foreground_mask(img_bgr: np.ndarray, cfg: dict) -> np.ndarray:
        le canal L étant pondéré par `l_weight` pour limiter l'effet des ombres).
     3. Seuillage automatique d'Otsu, puis morphologie : ouverture (supprime le bruit de
        texture), fermeture (consolide les bords), remplissage des trous internes.
+
+    Si un dictionnaire `steps` est fourni, les images intermédiaires y sont enregistrées
+    (utilisé par src/classical/debug_steps.py pour la visualisation).
     """
+    if steps is None:
+        steps = {}
     lab = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2LAB).astype(np.float32)
     h, w = lab.shape[:2]
     b = max(2, round(cfg["border_ratio"] * min(h, w)))
@@ -79,7 +84,9 @@ def foreground_mask(img_bgr: np.ndarray, cfg: dict) -> np.ndarray:
     dist = np.linalg.norm(diff, axis=2)
     dist = np.clip(dist * 255.0 / max(dist.max(), 1e-6), 0, 255).astype(np.uint8)
     dist = cv2.medianBlur(dist, int(cfg["blur_ksize"]) | 1)
+    steps["distance_fond"] = dist
     _, mask = cv2.threshold(dist, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    steps["otsu"] = mask
 
     k = int(cfg["morph_ksize"]) | 1
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))
@@ -88,8 +95,10 @@ def foreground_mask(img_bgr: np.ndarray, cfg: dict) -> np.ndarray:
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     filled = np.zeros_like(mask)
     cv2.drawContours(filled, contours, -1, 255, thickness=cv2.FILLED)
+    steps["morphologie"] = filled
     if cfg.get("drop_border_regions", True):
         filled = drop_border_regions(filled)
+    steps["masque_final"] = filled
     return filled
 
 
