@@ -1,0 +1,212 @@
+# SmartCoin — Tri et comptage des pièces de monnaie tunisiennes par Vision par Ordinateur
+
+> **Statut du projet : phase de cadrage (dépôt initial).**
+> Aucun modèle n'est encore implémenté ni entraîné. Ce dépôt présente le projet envisagé,
+> son organisation et le protocole expérimental prévu. Les sections marquées
+> « à compléter » seront mises à jour au fil du projet.
+
+Projet universitaire — module Vision par Ordinateur (IRM2).
+
+---
+
+## 1. Contexte et problématique
+
+Compter manuellement un ensemble de pièces de monnaie est une tâche répétitive et sujette
+aux erreurs (caisses, distributeurs, tirelires, commerces). Les pièces tunisiennes posent
+des difficultés spécifiques pour une solution automatique :
+
+- plusieurs valeurs ont des **tailles et des couleurs proches** ;
+- la **taille apparente** d'une pièce en pixels dépend de la distance et de l'angle de la caméra :
+  le diamètre seul ne permet pas d'identifier une valeur ;
+- les **reflets, ombres, usure, rotations** et les deux **faces différentes** d'une même pièce
+  modifient son apparence ;
+- les pièces peuvent être **proches, collées ou partiellement superposées**.
+
+**Problématique :** à partir d'une photographie contenant une ou plusieurs pièces tunisiennes,
+comment localiser chaque pièce, identifier sa valeur faciale, compter les pièces par catégorie
+et calculer le montant total — et quelle approche (traitement d'image classique ou Deep Learning)
+est la plus fiable selon les conditions de prise de vue ?
+
+## 2. Objectifs
+
+1. **Détecter et localiser** chaque pièce dans l'image (boîte englobante ou cercle).
+2. **Identifier la valeur faciale** de chaque pièce détectée.
+3. **Trier et compter** les pièces par catégorie.
+4. **Calculer le montant total** en dinars tunisiens (TND).
+5. **Afficher** une image annotée et un récapitulatif.
+6. **Comparer expérimentalement** une approche classique (sans IA) et une approche par
+   Deep Learning sur **exactement les mêmes images de test** et les mêmes annotations de référence.
+
+### Classes visées
+
+| Millimes | Dinars |
+|---|---|
+| 10, 20, 50, 100, 200, 500 | 1, 2, 5 |
+
+La prise en charge effective de chaque classe dépendra de sa présence suffisante dans les
+données (*à vérifier lors de l'inspection du dataset*). Une pièce non reconnue avec une
+confiance suffisante sera signalée comme **« inconnue »** plutôt que forcée dans une classe.
+
+## 3. Solution envisagée
+
+```text
+Image ──► Prétraitement ──► Détection des pièces ──► Identification de la valeur
+      ──► Tri et comptage par classe ──► Calcul du total (TND) ──► Image annotée + récapitulatif
+```
+
+**Entrée :** une image (photo) contenant une ou plusieurs pièces tunisiennes.
+**Sorties :** position de chaque pièce, valeur estimée et score de confiance/fiabilité,
+nombre de pièces par catégorie, montant total en TND, image annotée.
+La vidéo est une extension facultative.
+
+Deux pipelines indépendants produiront ces mêmes sorties, ce qui permettra de les comparer.
+
+## 4. Approches et architectures envisagées
+
+### 4.1 Approche classique (sans IA)
+
+Traitement d'image et règles de décision, avec **Python, OpenCV et NumPy** :
+
+| Étape | Méthodes envisagées |
+|---|---|
+| Prétraitement | Niveaux de gris, espaces HSV/Lab, flou gaussien ou médian, CLAHE |
+| Détection | `cv2.HoughCircles` (méthode de départ) ; en alternative : seuillage Otsu/adaptatif, morphologie mathématique, contours et composantes connexes (utile pour les pièces proches) |
+| Caractéristiques | Rayon/diamètre apparent **relatif**, aire, périmètre, circularité `4π·Aire/Périmètre²`, couleur dominante en HSV |
+| Classification | Règles et seuils **calibrés sur des images de développement**, combinant taille relative et couleur ; classe « inconnue » si aucune règle n'est satisfaite |
+
+### 4.2 Approche avec IA (Deep Learning)
+
+- **Solution principale : YOLOv8 (Ultralytics, PyTorch)** affiné (*fine-tuning*) sur nos données,
+  avec **une classe par valeur faciale**. Un seul modèle réalise la détection et la classification.
+  - *Justification :* pipeline simple, une seule source d'erreur, adapté au temps disponible
+    et à un dataset de taille modeste grâce au transfer learning.
+- **Alternative / expérience complémentaire : YOLO + CNN.** YOLO détecte une classe générique
+  « pièce », puis un CNN (ResNet18 ou MobileNetV2 pré-entraîné sur ImageNet, affiné) classifie
+  chaque pièce recadrée. Cette variante sera évaluée si le temps le permet, afin de mesurer
+  si la séparation détection/classification apporte un gain réel.
+
+Un seul framework de Deep Learning est utilisé : **PyTorch** (YOLOv8 repose sur PyTorch).
+
+### 4.3 Distinction détection / classification
+
+- **Détection** : trouver *où* se trouve chaque pièce (évaluée par IoU, précision/rappel de détection, mAP).
+- **Classification** : déterminer *quelle* est la valeur d'une pièce détectée (évaluée par
+  précision, rappel, F1 par classe, matrice de confusion).
+
+## 5. Dataset
+
+- **Source principale : images collectées par le groupe** (photos de pièces tunisiennes réelles).
+  - Nombre d'images, classes présentes, résolution, annotations : *à compléter après inspection*.
+- **Source complémentaire envisagée :** [Tunisian Currency Detection — Roboflow Universe](https://universe.roboflow.com/ahmed-khgsr/tunisian-currency-detection).
+  Le sujet indique 423 images annotées ; **ce chiffre, les classes et la licence restent à vérifier**
+  sur la page actuelle avant toute utilisation.
+- **Références visuelles et numismatiques :**
+  [Wikimedia Commons — Tunisian dinar coins](https://commons.wikimedia.org/wiki/Category:Tunisian_dinar_coins),
+  [Catalogue Cnumis — Tunisie](https://fr.cnumis.com/catalogue/region-images/tunisia-5).
+
+Les images **ne sont pas versionnées** sur GitHub (taille, droits). Voir [data/README.md](data/README.md)
+pour l'organisation locale et la préparation des données.
+
+## 6. Protocole de comparaison (prévu)
+
+1. Un **jeu de test commun figé**, listé dans [evaluation/test_manifest.csv](evaluation/test_manifest.csv),
+   jamais utilisé pour entraîner le modèle IA ni pour régler les seuils classiques.
+2. Un **fichier unique de vérité terrain**, [evaluation/ground_truth.csv](evaluation/ground_truth.csv),
+   utilisé par les deux approches.
+3. Appariement prédiction/annotation **un-à-un par IoU** (seuil initial 0,5, à justifier).
+4. Métriques comparées : précision, rappel et F1 de détection ; F1 macro de classification ;
+   matrice de confusion ; erreur de comptage par classe ; erreur absolue sur le montant total (TND) ;
+   temps moyen par image ; résultats par **niveau de difficulté** (1 : pièce seule sur fond uni →
+   4 : pièces proches ou superposées).
+
+Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat n'est disponible à ce stade.
+
+## 7. Principales étapes de réalisation
+
+| # | Étape | Statut |
+|---|---|---|
+| 1 | Dépôt GitHub initial et documentation | En cours |
+| 2 | Inspection et vérification du dataset (classes, nombre d'images, qualité, licence) | À faire |
+| 3 | Annotation, splits train/validation/test, jeu de test commun figé | À faire |
+| 4 | Approche classique (OpenCV + règles) | À faire |
+| 5 | Approche IA (YOLOv8, puis variante YOLO + CNN si pertinent) | À faire |
+| 6 | Évaluation et comparaison sur le jeu de test commun | À faire |
+| 7 | Interface de démonstration (Streamlit) | À faire |
+| 8 | Rapport et soutenance | À faire |
+
+## 8. Membres du groupe
+
+| Nom | Prénom |
+|---|---|
+| *À compléter* | *À compléter* |
+| *À compléter* | *À compléter* |
+
+## 9. Technologies et bibliothèques envisagées
+
+- **Langage :** Python 3.11 ou 3.12 (les versions plus récentes ne sont pas encore garanties
+  compatibles avec PyTorch/Ultralytics)
+- **Traitement d'image :** OpenCV, NumPy
+- **Données et visualisation :** Pandas, Matplotlib
+- **Métriques :** scikit-learn
+- **Deep Learning :** PyTorch, Ultralytics YOLOv8
+- **Interface :** Streamlit
+- **Environnement :** Jupyter / VS Code ; entraînement sur GPU via Kaggle ou Google Colab si nécessaire
+- **Annotation :** outil à choisir (ex. Roboflow, Label Studio ou CVAT)
+
+## 10. Installation et exécution (prévisionnelles)
+
+```bash
+# 1. Cloner le dépôt
+git clone <URL_DU_DEPOT_A_COMPLETER>
+cd <NOM_DU_DOSSIER>
+
+# 2. Créer et activer un environnement virtuel (Python 3.11 ou 3.12)
+py -3.12 -m venv .venv          # Windows
+.venv\Scripts\activate          # Windows
+# python3.12 -m venv .venv && source .venv/bin/activate   # Linux / macOS
+
+# 3. Installer les dépendances
+pip install -r requirements.txt
+
+# 4. Placer les données selon data/README.md
+```
+
+Commandes prévues (**non fonctionnelles à ce stade**, les scripts sont en cours de développement) :
+
+```bash
+python -m src.classical.pipeline --image chemin/vers/image.jpg      # approche classique
+python -m src.ai.train --config configs/yolo_data.yaml              # entraînement YOLO
+python -m src.evaluation.compare --manifest evaluation/test_manifest.csv   # comparaison
+streamlit run app/streamlit_app.py                                  # interface
+```
+
+## 11. Organisation du dépôt
+
+```text
+smartcoin/
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── configs/            # paramètres de l'approche classique et configuration YOLO
+├── data/               # données locales (non versionnées) + README d'organisation
+├── evaluation/         # manifeste du jeu de test commun + vérité terrain + protocole
+├── notebooks/          # exploration et inspection du dataset
+├── src/
+│   ├── common/         # classes de pièces, calcul du montant, métriques, visualisation
+│   ├── classical/      # pipeline OpenCV + règles (sans IA)
+│   ├── ai/             # entraînement, prédiction et évaluation YOLO
+│   └── evaluation/     # comparaison des deux approches
+├── app/                # interface Streamlit (prévue)
+├── tests/              # tests unitaires (prévus)
+├── models/             # poids entraînés (non versionnés) + README
+├── results/            # figures, tableaux, prédictions (non versionnés) + README
+└── docs/               # références et documentation
+```
+
+Les fichiers de code actuels sont des **squelettes** documentés : ils décrivent le rôle
+prévu de chaque module mais ne sont pas encore fonctionnels.
+
+## 12. Références
+
+Voir [docs/references.md](docs/references.md). Tout code, modèle pré-entraîné ou dataset
+externe utilisé sera cité.
