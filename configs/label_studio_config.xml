@@ -1,0 +1,20 @@
+<!-- Label Studio : coller dans Settings > Labeling Interface > Code -->
+<View>
+  <Image name="image" value="$image" zoom="true" zoomControl="true"/>
+  <RectangleLabels name="label" toName="image">
+    <Label value="10_millimes"  background="#d95a3c"/>
+    <Label value="20_millimes"  background="#e6902a"/>
+    <Label value="50_millimes"  background="#d9b92a"/>
+    <Label value="100_millimes" background="#3cbe78"/>
+    <Label value="200_millimes" background="#28a8aa"/>
+    <Label value="500_millimes" background="#2878c8"/>
+    <Label value="1_dinar"      background="#5a46c8"/>
+    <Label value="2_dinars"     background="#a03ca0"/>
+    <Label value="5_dinars"     background="#dc3c6e"/>
+    <Label value="a_verifier"   background="#8c8c8c"/>
+  </RectangleLabels>
+  <!-- Case à cocher par boîte : pièce partiellement cachée (occluded=1 dans ground_truth.csv) -->
+  <Choices name="occluded" toName="image" perRegion="true" visibleWhen="region-selected" choice="multiple">
+    <Choice value="occluded"/>
+  </Choices>
+</View>

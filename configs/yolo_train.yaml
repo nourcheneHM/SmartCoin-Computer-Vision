@@ -1,0 +1,20 @@
+# Hyperparamètres d'entraînement YOLOv8 (utilisés par src/ai/train.py)
+# Ne pas régler ces valeurs en regardant le jeu de test : seule la validation compte.
+model: yolov8s.pt        # poids pré-entraînés COCO (transfer learning). yolov8n.pt si peu de mémoire
+epochs: 100
+imgsz: 1024
+batch: 8                 # baisser à 4 si "CUDA out of memory"
+patience: 30             # arrêt anticipé si la validation ne progresse plus
+seed: 42
+deterministic: true
+workers: 2
+# Augmentations adaptées aux pièces : couleur importante (or / argent), pas de rotation
+# (une rotation agrandit la boîte autour d'un disque), retournements autorisés.
+flipud: 0.5
+fliplr: 0.5
+degrees: 0.0
+hsv_h: 0.01
+hsv_s: 0.4
+hsv_v: 0.4
+scale: 0.5
+mosaic: 1.0
