@@ -33,7 +33,7 @@ def load_model(weights: str | Path):
 
 
 def predict_image(model, image, conf: float = 0.25, imgsz: int = 1024,
-                  nms_iou: float = 0.7) -> pd.DataFrame:
+                  nms_iou: float = 0.45) -> pd.DataFrame:
     """`image` : chemin ou tableau BGR. Retourne les détections (sans la colonne image_id)."""
     res = model.predict(source=image, conf=conf, imgsz=imgsz, iou=nms_iou, verbose=False)[0]
     boxes = res.boxes

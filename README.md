@@ -38,12 +38,12 @@ est la plus fiable selon les conditions de prise de vue ?
 
 ### Classes visées
 
-| Millimes | Dinars |
-|---|---|
+| Millimes                  | Dinars  |
+| ------------------------- | ------- |
 | 10, 20, 50, 100, 200, 500 | 1, 2, 5 |
 
 La prise en charge effective de chaque classe dépendra de sa présence suffisante dans les
-données (*à vérifier lors de l'inspection du dataset*). Une pièce non reconnue avec une
+données (_à vérifier lors de l'inspection du dataset_). Une pièce non reconnue avec une
 confiance suffisante sera signalée comme **« inconnue »** plutôt que forcée dans une classe.
 
 ## 3. Solution envisagée
@@ -67,13 +67,13 @@ Deux pipelines indépendants produiront ces mêmes sorties, ce qui permettra de 
 Traitement d'image et règles de décision, avec **Python, OpenCV et NumPy**
 (code : [src/classical/](src/classical/), paramètres : [configs/classical.yaml](configs/classical.yaml)) :
 
-| Étape | Méthodes retenues |
-|---|---|
-| Prétraitement | Redimensionnement (1024 px), niveaux de gris, CLAHE, flou médian |
-| Détection | **Hybride** : `cv2.HoughCircles` (contours) + segmentation par soustraction de la couleur du fond (Lab, Otsu, morphologie, transformée de distance pour séparer les pièces collées) ; fusion et suppression des cercles imbriqués |
-| Caractéristiques | Couleur **Lab** (jaune b* du disque, du centre et de l'anneau), contraste bimétal, score de forme à **13 côtés** (bord suivi par programmation dynamique + harmonique de Fourier), rayon affiné |
-| Classification | Règles : métal (5 dinars = bimétal ; doré/argenté jugé **relativement** aux autres pièces de la photo, avec le 5 dinars comme référence de couleur), forme (200 millimes / 2 dinars), puis **taille relative** : recherche de l'échelle (pixels/mm) qui explique le mieux tous les rayons de la photo par les diamètres réels ; « inconnue » si aucun diamètre compatible |
-| Comptage | Nombre par classe et montant total en millimes (les inconnues sont exclues du total) |
+| Étape            | Méthodes retenues                                                                                                                                                                                                                                                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prétraitement    | Redimensionnement (1024 px), niveaux de gris, CLAHE, flou médian                                                                                                                                                                                                                                                                                                          |
+| Détection        | **Hybride** : `cv2.HoughCircles` (contours) + segmentation par soustraction de la couleur du fond (Lab, Otsu, morphologie, transformée de distance pour séparer les pièces collées) ; fusion et suppression des cercles imbriqués                                                                                                                                         |
+| Caractéristiques | Couleur **Lab** (jaune b\* du disque, du centre et de l'anneau), contraste bimétal, score de forme à **13 côtés** (bord suivi par programmation dynamique + harmonique de Fourier), rayon affiné                                                                                                                                                                          |
+| Classification   | Règles : métal (5 dinars = bimétal ; doré/argenté jugé **relativement** aux autres pièces de la photo, avec le 5 dinars comme référence de couleur), forme (200 millimes / 2 dinars), puis **taille relative** : recherche de l'échelle (pixels/mm) qui explique le mieux tous les rayons de la photo par les diamètres réels ; « inconnue » si aucun diamètre compatible |
+| Comptage         | Nombre par classe et montant total en millimes (les inconnues sont exclues du total)                                                                                                                                                                                                                                                                                      |
 
 Seuils calibrés **uniquement sur les images de développement**. Résultats de développement
 (55 photos multi-pièces, 364 pièces, évaluation par comptage) : 363 pièces détectées,
@@ -83,9 +83,9 @@ jeu de test au jalon 5. Détails, choix et limites : [docs/remarques_rapport.md]
 
 ### 4.2 Approche avec IA (Deep Learning)
 
-- **Solution principale : YOLOv8 (Ultralytics, PyTorch)** affiné (*fine-tuning*) sur nos données,
+- **Solution principale : YOLOv8 (Ultralytics, PyTorch)** affiné (_fine-tuning_) sur nos données,
   avec **une classe par valeur faciale**. Un seul modèle réalise la détection et la classification.
-  - *Justification :* pipeline simple, une seule source d'erreur, adapté au temps disponible
+  - _Justification :_ pipeline simple, une seule source d'erreur, adapté au temps disponible
     et à un dataset de taille modeste grâce au transfer learning.
 - **Alternative / expérience complémentaire : YOLO + CNN.** YOLO détecte une classe générique
   « pièce », puis un CNN (ResNet18 ou MobileNetV2 pré-entraîné sur ImageNet, affiné) classifie
@@ -96,8 +96,8 @@ Un seul framework de Deep Learning est utilisé : **PyTorch** (YOLOv8 repose sur
 
 ### 4.3 Distinction détection / classification
 
-- **Détection** : trouver *où* se trouve chaque pièce (évaluée par IoU, précision/rappel de détection, mAP).
-- **Classification** : déterminer *quelle* est la valeur d'une pièce détectée (évaluée par
+- **Détection** : trouver _où_ se trouve chaque pièce (évaluée par IoU, précision/rappel de détection, mAP).
+- **Classification** : déterminer _quelle_ est la valeur d'une pièce détectée (évaluée par
   précision, rappel, F1 par classe, matrice de confusion).
 
 ## 5. Dataset
@@ -110,7 +110,7 @@ Un seul framework de Deep Learning est utilisé : **PyTorch** (YOLOv8 repose sur
   - 230 photos initiales (une pièce par photo, classées par valeur) et 112 photos
     complémentaires prises selon un protocole par niveau de difficulté (1 à 4).
   - **Jeu de test commun figé :** 30 images (10 par niveau 2, 3 et 4) contenant **220 pièces**.
-  - Annotations par boîtes englobantes : *à réaliser avant le jalon 4*.
+  - Annotations par boîtes englobantes : _à réaliser avant le jalon 4_.
 - **Références visuelles et numismatiques** (documentation uniquement, non utilisées pour l'entraînement) :
   [Wikimedia Commons — Tunisian dinar coins](https://commons.wikimedia.org/wiki/Category:Tunisian_dinar_coins),
   [Catalogue Cnumis — Tunisie](https://fr.cnumis.com/catalogue/region-images/tunisia-5).
@@ -134,23 +134,23 @@ Détails : [evaluation/README.md](evaluation/README.md). Aucun résultat sur le 
 
 ## 7. Principales étapes de réalisation
 
-| Jalon | Contenu | Statut |
-|---|---|---|
-| 1 — Dépôt GitHub | Dépôt, README, arborescence, dépendances, documentation | Terminé |
-| 2 — Dataset | Collecte, inspection, organisation des images, jeu de test commun figé | Terminé (annotations des boîtes et split de validation à faire avant le jalon 4) |
-| 3 — Approche classique | Détection et classification des pièces avec OpenCV et des règles | Terminé (paramètres figés) |
-| 4 — Approche IA | Entraînement et évaluation de YOLOv8 (variante YOLO + CNN si pertinent) | À faire |
-| 5 — Comparaison | Les deux approches sur exactement les mêmes images de test | À faire |
-| 6 — Application et rapport | Interface Streamlit, rapport, présentation | À faire |
+| Jalon                      | Contenu                                                                 | Statut                                                                           |
+| -------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| 1 — Dépôt GitHub           | Dépôt, README, arborescence, dépendances, documentation                 | Terminé                                                                          |
+| 2 — Dataset                | Collecte, inspection, organisation des images, jeu de test commun figé  | Terminé (annotations des boîtes et split de validation à faire avant le jalon 4) |
+| 3 — Approche classique     | Détection et classification des pièces avec OpenCV et des règles        | Terminé (paramètres figés)                                                       |
+| 4 — Approche IA            | Entraînement et évaluation de YOLOv8 (variante YOLO + CNN si pertinent) | À faire                                                                          |
+| 5 — Comparaison            | Les deux approches sur exactement les mêmes images de test              | À faire                                                                          |
+| 6 — Application et rapport | Interface Streamlit, rapport, présentation                              | À faire                                                                          |
 
 ## 8. Membres du groupe
 
-| Nom | Prénom |
-|---|---|
+| Nom     | Prénom    |
+| ------- | --------- |
 | Hammami | Nourchene |
-| Gherab | Lasisa  |
-| Bahrini| Adem |
-| Maaoui | Rayene  |
+| Gherab  | Lasisa    |
+| Bahrini | Adem      |
+| Maaoui  | Rayene    |
 
 ## 9. Technologies et bibliothèques envisagées
 

@@ -25,7 +25,7 @@ from src.common.labels import (CLASS_NAMES, SHORT_LABEL, UNKNOWN, VALUE_MILLIMES
 st.set_page_config(page_title="SmartCoin", page_icon="🪙", layout="wide")
 
 MODE_AI, MODE_CLASSIC, MODE_BOTH = "IA (YOLOv8)", "Classique (OpenCV)", "Comparer les deux"
-DEFAULT_WEIGHTS = "models/yolov8_smartcoin_best.pt"
+DEFAULT_WEIGHTS = str(Path.home() / "Desktop" / "School things" / "lasisa_things" / "IRM 2_2" / "Computer vision" / "SmartCoin" / "smartcoin" / "models" / "yolov8_smartcoin_best.pt")
 
 
 @st.cache_resource(show_spinner=False)
@@ -115,7 +115,7 @@ results: dict[str, tuple[pd.DataFrame, float]] = {}
 with st.spinner("Analyse en cours…"):
     if use_ai:
         try:
-            results[MODE_AI] = run_ai(img, str(ROOT / weights), conf)
+            results[MODE_AI] = run_ai(img, weights, conf)
         except Exception as e:  # noqa: BLE001
             st.error(f"IA indisponible : {e}")
     if use_classic:
